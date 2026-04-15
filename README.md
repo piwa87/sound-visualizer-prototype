@@ -20,6 +20,11 @@ type hints, docstrings, proper entry-point guards).
 > sudo apt install python3-gst-1.0 gstreamer1.0-plugins-good
 > ```
 
+> **Linux users (real-time visualizer):** `sounddevice` requires PortAudio. Install it before running `realtime_3d_visualizer.py`:
+> ```bash
+> sudo apt install libportaudio2
+> ```
+
 ---
 
 ## Setup
@@ -45,6 +50,10 @@ The `requirements.txt` installs:
 | `matplotlib` | Plotting and animations |
 | `numpy` | Numerical array operations |
 | `playsound` | Optional audio preview before visualizing |
+| `sounddevice` | Real-time audio streaming (chunk-by-chunk playback) |
+| `soundfile` | WAV/FLAC file reading for the real-time visualizer |
+| `vispy` | OpenGL-accelerated 3D surface rendering |
+| `PyOpenGL` | OpenGL backend required by vispy |
 
 ---
 
@@ -56,6 +65,7 @@ The `requirements.txt` installs:
 | `stereo_channel_visualizer.py` | Displays stacked left/right spectrograms for a stereo audio file. |
 | `stereo_image_analyzer.py` | Estimates the panning angle per frequency bin and plots the stereo image. |
 | `animation_sine_wave.py` | Animated travelling sine wave — conceptual illustration of a periodic waveform. |
+| `realtime_3d_visualizer.py` | **Real-time** 3D waterfall: plays audio while rendering a live OpenGL spectrogram surface. |
 
 ---
 
@@ -110,6 +120,42 @@ No prompts — opens a looping Matplotlib animation of a travelling sine wave.
 Useful as a conceptual illustration of a periodic waveform before digitisation.
 Close the window to exit.
 
+### Real-time 3D audio waterfall *(new)*
+
+```bash
+python realtime_3d_visualizer.py
+```
+
+Prompts you to pick one of eight audio samples (all five mono samples plus the
+three stereo samples).  Once selected, the script:
+
+1. Opens an OpenGL window showing a 3D spectrogram surface — frequency on the
+   X axis, time history on the Y axis, and amplitude (dB) on the Z axis,
+   colour-mapped from dark (quiet) to bright yellow/white (loud).
+2. Starts playing the chosen audio file through your default output device.
+3. Updates the 3D surface in real time (~33 FPS) as each audio chunk plays,
+   so the visualization is in sync with what you hear.
+
+**Controls while the window is open:**
+
+| Action | Effect |
+|---|---|
+| Left-drag | Rotate the 3D surface |
+| Scroll wheel | Zoom in / out |
+| Right-drag | Pan |
+
+The window closes automatically when playback ends.
+
+**How it works:**
+
+Audio is read in 2048-sample chunks (~46 ms at 44.1 kHz) via a
+`sounddevice` OutputStream callback.  Each callback fills the sound-card
+buffer and simultaneously pushes a mono mix of the chunk to a thread-safe
+queue.  A vispy `Timer` fires on the main thread every 30 ms, drains the
+queue, computes a 4 096-point FFT, maps the result to 256 log-spaced
+frequency display bins, converts to dB, and feeds the normalised values to a
+vispy `SurfacePlot` for GPU rendering.
+
 ---
 
 ## Audio samples
@@ -123,6 +169,6 @@ All sample files are in the `sounds/` directory:
 | `03_horns.wav` | Mono visualizer |
 | `04_explosion.wav` | Mono visualizer |
 | `05_synth_pad.wav` | Mono visualizer |
-| `stereo_piano.wav` | Stereo visualizer, Stereo image analyzer |
-| `stereo_synth.wav` | Stereo visualizer |
-| `stereo_synth_pan.wav` | Stereo visualizer |
+| `stereo_piano.wav` | Stereo visualizer, Stereo image analyzer, Real-time 3D visualizer |
+| `stereo_synth.wav` | Stereo visualizer, Real-time 3D visualizer |
+| `stereo_synth_pan.wav` | Stereo visualizer, Real-time 3D visualizer |
