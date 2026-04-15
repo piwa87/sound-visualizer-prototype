@@ -14,7 +14,8 @@ import librosa
 import librosa.display
 import matplotlib.pyplot as plt
 import numpy as np
-from playsound import playsound
+import sounddevice as sd
+import soundfile as sf
 
 from utils import choose_sound, get_menu_choice
 
@@ -74,7 +75,9 @@ def main() -> None:
     file_path, title = choose_sound(sound_choice, SOUNDS, SCRIPT_DIR)
 
     if play == "y":
-        playsound(str(file_path))
+        data, samplerate = sf.read(str(file_path))
+        sd.play(data, samplerate)
+        sd.wait()
 
     build_stereo_spectrogram(file_path, scale, title)
 
