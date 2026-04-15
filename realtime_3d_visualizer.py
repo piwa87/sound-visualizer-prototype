@@ -251,11 +251,15 @@ class WaterfallVisualizer:
         ys = np.linspace(0.0, 1.0, self._n_time_frames, dtype=np.float32)
         z0 = np.zeros((self._n_time_frames, self._n_freq), dtype=np.float32)
 
+        # vispy expects z shape (len(x), len(y)) == (n_freq, n_time_frames),
+        # so transpose the grid which is stored as (n_time_frames, n_freq).
+        # Colors are not passed here to avoid a vispy bug where set_vertex_colors
+        # is called before set_faces during construction; they are applied on the
+        # first update() tick instead.
         surface = vispy.scene.visuals.SurfacePlot(
             x=xs,
             y=ys,
-            z=z0,
-            colors=self._z_to_colors(z0),
+            z=z0.T,
             parent=view.scene,
         )
         return canvas, surface
@@ -340,7 +344,7 @@ class WaterfallVisualizer:
             (self._grid - self._db_floor) / (-self._db_floor)
         ).astype(np.float32)
 
-        self._surface.set_data(z=z_norm, colors=self._z_to_colors(z_norm))
+        self._surface.set_data(z=z_norm.T, colors=self._z_to_colors(z_norm.T))
 
     # ── Entry point ───────────────────────────────────────────────────────────
 
