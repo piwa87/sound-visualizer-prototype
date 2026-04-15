@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from playsound import playsound
 
-from utils import get_menu_choice
+from utils import choose_sound, get_menu_choice
 
 SCRIPT_DIR = Path(__file__).parent
 
@@ -27,22 +27,6 @@ SOUNDS: dict[int, tuple[str, str]] = {
     4: ("sounds/04_explosion.wav", "Explosion"),
     5: ("sounds/05_synth_pad.wav", "Rhythmic synth pad with a filter"),
 }
-
-
-def choose_sound(choice: int) -> tuple[Path, str]:
-    """Return the absolute file path and display title for the given choice.
-
-    Args:
-        choice: Integer key that must exist in :data:`SOUNDS`.
-
-    Returns:
-        A ``(file_path, title)`` tuple.
-
-    Raises:
-        KeyError: If *choice* is not a valid key in :data:`SOUNDS`.
-    """
-    relative_path, title = SOUNDS[choice]
-    return SCRIPT_DIR / relative_path, title
 
 
 def build_spectrogram(file_path: Path, scale: str, title: str) -> None:
@@ -83,7 +67,7 @@ def main() -> None:
 
     play = input("     Play the sound sample before visualizing? (y/n) ").strip().lower()
 
-    file_path, title = choose_sound(sound_choice)
+    file_path, title = choose_sound(sound_choice, SOUNDS, SCRIPT_DIR)
 
     if play == "y":
         playsound(str(file_path))
