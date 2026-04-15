@@ -25,6 +25,12 @@ type hints, docstrings, proper entry-point guards).
 > sudo apt install libportaudio2
 > ```
 
+> **macOS users (real-time visualizer):** `vispy` requires a GUI windowing backend.
+> `PyQt6` is included in `requirements.txt` and will be installed automatically by
+> `pip install -r requirements.txt`.  If you see a *"Could not import any of the backends"*
+> error, make sure the install completed without errors and that you are running inside
+> the virtual environment.
+
 ---
 
 ## Setup
@@ -53,7 +59,8 @@ The `requirements.txt` installs:
 | `sounddevice` | Real-time audio streaming (chunk-by-chunk playback) |
 | `soundfile` | WAV/FLAC file reading for the real-time visualizer |
 | `vispy` | OpenGL-accelerated 3D surface rendering |
-| `PyOpenGL` | OpenGL backend required by vispy |
+| `PyOpenGL` | OpenGL bindings required by vispy |
+| `PyQt6` | GUI windowing backend required by vispy to open a window |
 
 ---
 
