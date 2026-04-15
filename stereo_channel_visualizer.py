@@ -63,7 +63,7 @@ def build_stereo_spectrogram(file_path: Path, scale: str, title: str) -> None:
     axes[0].set_title(f"Left Channel | {title}")
     axes[0].label_outer()
 
-    librosa.display.specshow(right, y_axis=scale, x_axis="time", ax=axes[1])
+    librosa.display.specshow(right, y_axis=scale, x_axis="time", sr=sample_rate, ax=axes[1])
     axes[1].set_title(f"Right Channel | {title}")
     axes[1].label_outer()
 

@@ -58,6 +58,8 @@ def compute_stereo_angles(
     Returns:
         Array of panning angles in degrees with the same shape as the inputs.
     """
+    if reference_angle_deg == 0.0:
+        raise ValueError("reference_angle_deg must be non-zero to avoid division by zero.")
     ref_sin = np.sin(np.deg2rad(reference_angle_deg))
     denominator = left_db + right_db
     with np.errstate(invalid="ignore", divide="ignore"):
